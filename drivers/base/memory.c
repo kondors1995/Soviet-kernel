@@ -289,11 +289,31 @@ static int __memory_block_change_state(struct memory_block *mem,
 		mem->state = MEM_GOING_OFFLINE;
 
 	ret = memory_block_action(mem->start_section_nr, to_state, online_type);
+	mem->state = ret ? from_state_req : to_state;
+	return ret;
+}
 
-	if (ret) {
-		mem->state = from_state_req;
-		goto out;
-	}
+static int memory_subsys_online(struct device *dev)
+{
+	struct memory_block *mem = container_of(dev, struct memory_block, dev);
+	int ret;
+
+	mutex_lock(&mem->state_mutex);
+
+	ret = mem->state == MEM_ONLINE ? 0 :
+		__memory_block_change_state(mem, MEM_ONLINE, MEM_OFFLINE,
+					    ONLINE_KEEP);
+
+	mutex_unlock(&mem->state_mutex);
+	return ret;
+}
+
+static int memory_subsys_offline(struct device *dev)
+{
+	struct memory_block *mem = container_of(dev, struct memory_block, dev);
+	int ret;
+
+	mutex_lock(&mem->state_mutex);
 
 	mem->state = to_state;
 	switch (mem->state) {
