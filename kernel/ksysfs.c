@@ -3,7 +3,7 @@
  * 		     are not related to any other subsystem
  *
  * Copyright (C) 2004 Kay Sievers <kay.sievers@vrfy.org>
- * 
+ *
  * This file is release under the GPLv2
  *
  */
@@ -204,7 +204,8 @@ static struct attribute_group kernel_attr_group = {
 	.attrs = kernel_attrs,
 };
 
-static unsigned int Lgentle_fair_sleepers = 0;
+
+static unsigned int Lgentle_fair_sleepers = 1;
 extern void relay_gfs(unsigned int gfs);
 
 static ssize_t gentle_fair_sleepers_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
@@ -218,7 +219,7 @@ static ssize_t gentle_fair_sleepers_store(struct kobject *kobj, struct kobj_attr
 	ret = sscanf(buf, "%u", &input);
 	if (input != 0 && input != 1)
 		input = 0;
-	
+
 	Lgentle_fair_sleepers = input;
 	relay_gfs(Lgentle_fair_sleepers);
 	return count;
