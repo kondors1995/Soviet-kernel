@@ -1087,11 +1087,14 @@ static const char *hwcap_str[] = {
 };
 
 static const char *hwcap2_str[] = {
+<<<<<<< HEAD
 	"aes",
 	"pmull",
 	"sha1",
 	"sha2",
 	"crc32",
+=======
+>>>>>>> 0cd9cbd358e7... ARM: 7981/1: add support for AT_HWCAP2 ELF auxv entry
 	NULL
 };
 
