@@ -57,12 +57,12 @@
 #include <asm/memblock.h>
 #include <asm/virt.h>
 
-/* DTS20141205XXXXX qidechun/yantongguang 2014-12-05 begin */ 
+/* DTS20141205XXXXX qidechun/yantongguang 2014-12-05 begin */
 #ifdef CONFIG_DUMP_SYS_INFO
 #include <linux/module.h>
 #include <linux/srecorder.h>
 #endif
-/* DTS20141205XXXXX qidechun/yantongguang 2014-12-05 end */ 
+/* DTS20141205XXXXX qidechun/yantongguang 2014-12-05 end */
 #include "atags.h"
 
 
@@ -161,7 +161,7 @@ EXPORT_SYMBOL(elf_platform);
 static const char *cpu_name;
 static const char *machine_name;
 
-/* DTS20141205XXXXX qidechun/yantongguang 2014-12-05 begin */ 
+/* DTS20141205XXXXX qidechun/yantongguang 2014-12-05 begin */
 #ifdef CONFIG_DUMP_SYS_INFO
 unsigned long get_cpu_name(void)
 {
@@ -175,7 +175,7 @@ unsigned long get_machine_name(void)
 }
 EXPORT_SYMBOL(get_machine_name);
 #endif
-/* DTS20141205XXXXX qidechun/yantongguang 2014-12-05 end */ 
+/* DTS20141205XXXXX qidechun/yantongguang 2014-12-05 end */
 
 static char __initdata cmd_line[COMMAND_LINE_SIZE];
 struct machine_desc *machine_desc __initdata;
@@ -1087,14 +1087,11 @@ static const char *hwcap_str[] = {
 };
 
 static const char *hwcap2_str[] = {
-<<<<<<< HEAD
 	"aes",
 	"pmull",
 	"sha1",
 	"sha2",
 	"crc32",
-=======
->>>>>>> 0cd9cbd358e7... ARM: 7981/1: add support for AT_HWCAP2 ELF auxv entry
 	NULL
 };
 
