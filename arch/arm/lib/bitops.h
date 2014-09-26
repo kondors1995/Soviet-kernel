@@ -37,6 +37,7 @@ UNWIND(	.fnstart	)
 	cmp	r0, #0
 	bne	1b
 2:	bx	lr
+3:	strb	r1, [ip]
 UNWIND(	.fnend		)
 ENDPROC(\name		)
 	.endm
@@ -68,6 +69,7 @@ UNWIND(	.fnstart	)
 2:	cmp	r0, #0
 	movne	r0, #1
 	bx	lr
+3:	strb	r1, [ip]
 UNWIND(	.fnend		)
 ENDPROC(\name		)
 	.endm
