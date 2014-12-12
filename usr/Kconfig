@@ -165,4 +165,13 @@ config INITRAMFS_COMPRESSION_LZO
 	  size is about 10% bigger than gzip; however its speed
 	  (both compression and decompression) is the fastest.
 
+config RD_LZ4
+	bool "Support initial ramdisks compressed using LZ4" if EXPERT
+	default !EXPERT
+	depends on BLK_DEV_INITRD
+	select DECOMPRESS_LZ4
+	help
+	  Support loading of a LZ4 encoded initial ramdisk or cpio buffer
+	  If unsure, say N.
+
 endchoice
