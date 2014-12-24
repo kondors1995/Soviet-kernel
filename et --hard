@@ -1,0 +1,85 @@
+[1mdiff --cc net/ipv4/tcp_cdg.c[m
+[1mindex d782d5d,a52ce2d..0000000[m
+[1m--- a/net/ipv4/tcp_cdg.c[m
+[1m+++ b/net/ipv4/tcp_cdg.c[m
+[36m@@@ -139,15 -139,15 +139,25 @@@[m [mstatic void tcp_cdg_hystart_update(stru[m
+  {[m
+  	struct cdg *ca = inet_csk_ca(sk);[m
+  	struct tcp_sock *tp = tcp_sk(sk);[m
+[32m++<<<<<<< HEAD[m
+[32m +	u32 in_flight;[m
+[32m++=======[m
+[32m+ [m
+[32m++>>>>>>> ac0ecdf... tcp: add CDG congestion control[m
+  	ca->delay_min = min_not_zero(ca->delay_min, ca->rtt.min);[m
+  	if (ca->delay_min == 0)[m
+  		return;[m
+  [m
+  	if (hystart_detect & HYSTART_ACK_TRAIN) {[m
+[32m++<<<<<<< HEAD[m
+[32m +		u32 now_us = div_u64(local_clock(), NSEC_PER_USEC);[m
+[32m +[m
+[32m +		if (ca->last_ack == 0 || !tcp_is_cwnd_limited(sk, in_flight)) {[m
+[32m++=======[m
+[32m+ 		u32 now_us = local_clock() / NSEC_PER_USEC;[m
+[32m+ [m
+[32m+ 		if (ca->last_ack == 0 || !tcp_is_cwnd_limited(sk)) {[m
+[32m++>>>>>>> ac0ecdf... tcp: add CDG congestion control[m
+  			ca->last_ack = now_us;[m
+  			ca->round_start = now_us;[m
+  		} else if (before(now_us, ca->last_ack + 3000)) {[m
+[36m@@@ -252,12 -252,12 +262,20 @@@[m [mstatic bool tcp_cdg_backoff(struct soc[m
+  [m
+  	ca->shadow_wnd = max(ca->shadow_wnd, tp->snd_cwnd);[m
+  	ca->state = CDG_BACKOFF;[m
+[32m++<<<<<<< HEAD[m
+[32m +	tcp_enter_cwr(sk, 1);[m
+[32m++=======[m
+[32m+ 	tcp_enter_cwr(sk);[m
+[32m++>>>>>>> ac0ecdf... tcp: add CDG congestion control[m
+  	return true;[m
+  }[m
+  [m
+  /* Not called in CWR or Recovery state. */[m
+[32m++<<<<<<< HEAD[m
+[32m +static void tcp_cdg_cong_avoid(struct sock *sk, u32 ack, u32 in_flight)[m
+[32m++=======[m
+[32m+ static void tcp_cdg_cong_avoid(struct sock *sk, u32 ack, u32 acked)[m
+[32m++>>>>>>> ac0ecdf... tcp: add CDG congestion control[m
+  {[m
+  	struct cdg *ca = inet_csk_ca(sk);[m
+  	struct tcp_sock *tp = tcp_sk(sk);[m
+[36m@@@ -282,13 -282,13 +300,21 @@@[m
+  			return;[m
+  	}[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +	if (!tcp_is_cwnd_limited(sk, in_flight)) {[m
+[32m++=======[m
+[32m+ 	if (!tcp_is_cwnd_limited(sk)) {[m
+[32m++>>>>>>> ac0ecdf... tcp: add CDG congestion control[m
+  		ca->shadow_wnd = min(ca->shadow_wnd, tp->snd_cwnd);[m
+  		return;[m
+  	}[m
+  [m
+  	prior_snd_cwnd = tp->snd_cwnd;[m
+[32m++<<<<<<< HEAD[m
+[32m +	tcp_reno_cong_avoid(sk, ack, in_flight);[m
+[32m++=======[m
+[32m+ 	tcp_reno_cong_avoid(sk, ack, acked);[m
+[32m++>>>>>>> ac0ecdf... tcp: add CDG congestion control[m
+  [m
+  	incr = tp->snd_cwnd - prior_snd_cwnd;[m
+  	ca->shadow_wnd = max(ca->shadow_wnd, ca->shadow_wnd + incr);[m
+[36m@@@ -397,7 -397,7 +423,11 @@@[m [mstatic void tcp_cdg_release(struct soc[m
+  	kfree(ca->gradients);[m
+  }[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +static struct tcp_congestion_ops tcp_cdg __read_mostly = {[m
+[32m++=======[m
+[32m+ struct tcp_congestion_ops tcp_cdg __read_mostly = {[m
+[32m++>>>>>>> ac0ecdf... tcp: add CDG congestion control[m
+  	.cong_avoid = tcp_cdg_cong_avoid,[m
+  	.cwnd_event = tcp_cdg_cwnd_event,[m
+  	.pkts_acked = tcp_cdg_acked,[m
