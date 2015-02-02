@@ -19,6 +19,93 @@ struct extent_status;
 
 #define EXT4_I(inode) (container_of(inode, struct ext4_inode_info, vfs_inode))
 
+#define show_mballoc_flags(flags) __print_flags(flags, "|",	\
+	{ EXT4_MB_HINT_MERGE,		"HINT_MERGE" },		\
+	{ EXT4_MB_HINT_RESERVED,	"HINT_RESV" },		\
+	{ EXT4_MB_HINT_METADATA,	"HINT_MDATA" },		\
+	{ EXT4_MB_HINT_FIRST,		"HINT_FIRST" },		\
+	{ EXT4_MB_HINT_BEST,		"HINT_BEST" },		\
+	{ EXT4_MB_HINT_DATA,		"HINT_DATA" },		\
+	{ EXT4_MB_HINT_NOPREALLOC,	"HINT_NOPREALLOC" },	\
+	{ EXT4_MB_HINT_GROUP_ALLOC,	"HINT_GRP_ALLOC" },	\
+	{ EXT4_MB_HINT_GOAL_ONLY,	"HINT_GOAL_ONLY" },	\
+	{ EXT4_MB_HINT_TRY_GOAL,	"HINT_TRY_GOAL" },	\
+	{ EXT4_MB_DELALLOC_RESERVED,	"DELALLOC_RESV" },	\
+	{ EXT4_MB_STREAM_ALLOC,		"STREAM_ALLOC" },	\
+	{ EXT4_MB_USE_ROOT_BLOCKS,	"USE_ROOT_BLKS" },	\
+	{ EXT4_MB_USE_RESERVED,		"USE_RESV" })
+
+#define show_map_flags(flags) __print_flags(flags, "|",			\
+	{ EXT4_GET_BLOCKS_CREATE,		"CREATE" },		\
+	{ EXT4_GET_BLOCKS_UNWRIT_EXT,		"UNWRIT" },		\
+	{ EXT4_GET_BLOCKS_DELALLOC_RESERVE,	"DELALLOC" },		\
+	{ EXT4_GET_BLOCKS_PRE_IO,		"PRE_IO" },		\
+	{ EXT4_GET_BLOCKS_CONVERT,		"CONVERT" },		\
+	{ EXT4_GET_BLOCKS_METADATA_NOFAIL,	"METADATA_NOFAIL" },	\
+	{ EXT4_GET_BLOCKS_NO_NORMALIZE,		"NO_NORMALIZE" },	\
+	{ EXT4_GET_BLOCKS_KEEP_SIZE,		"KEEP_SIZE" },		\
+	{ EXT4_GET_BLOCKS_NO_LOCK,		"NO_LOCK" },		\
+	{ EXT4_GET_BLOCKS_NO_PUT_HOLE,		"NO_PUT_HOLE" })
+
+#define show_mflags(flags) __print_flags(flags, "",	\
+	{ EXT4_MAP_NEW,		"N" },			\
+	{ EXT4_MAP_MAPPED,	"M" },			\
+	{ EXT4_MAP_UNWRITTEN,	"U" },			\
+	{ EXT4_MAP_BOUNDARY,	"B" },			\
+	{ EXT4_MAP_FROM_CLUSTER, "C" })
+
+#define show_free_flags(flags) __print_flags(flags, "|",	\
+	{ EXT4_FREE_BLOCKS_METADATA,		"METADATA" },	\
+	{ EXT4_FREE_BLOCKS_FORGET,		"FORGET" },	\
+	{ EXT4_FREE_BLOCKS_VALIDATED,		"VALIDATED" },	\
+	{ EXT4_FREE_BLOCKS_NO_QUOT_UPDATE,	"NO_QUOTA" },	\
+	{ EXT4_FREE_BLOCKS_NOFREE_FIRST_CLUSTER,"1ST_CLUSTER" },\
+	{ EXT4_FREE_BLOCKS_NOFREE_LAST_CLUSTER,	"LAST_CLUSTER" })
+
+#define show_extent_status(status) __print_flags(status, "",	\
+	{ EXTENT_STATUS_WRITTEN,	"W" },			\
+	{ EXTENT_STATUS_UNWRITTEN,	"U" },			\
+	{ EXTENT_STATUS_DELAYED,	"D" },			\
+	{ EXTENT_STATUS_HOLE,		"H" })
+
+#define show_falloc_mode(mode) __print_flags(mode, "|",		\
+	{ FALLOC_FL_KEEP_SIZE,		"KEEP_SIZE"},		\
+	{ FALLOC_FL_PUNCH_HOLE,		"PUNCH_HOLE"},		\
+	{ FALLOC_FL_NO_HIDE_STALE,	"NO_HIDE_STALE"},	\
+	{ FALLOC_FL_COLLAPSE_RANGE,	"COLLAPSE_RANGE"},	\
+	{ FALLOC_FL_ZERO_RANGE,		"ZERO_RANGE"})
+
+
+TRACE_EVENT(ext4_other_inode_update_time,
+	TP_PROTO(struct inode *inode, ino_t orig_ino),
+
+	TP_ARGS(inode, orig_ino),
+
+	TP_STRUCT__entry(
+		__field(	dev_t,	dev			)
+		__field(	ino_t,	ino			)
+		__field(	ino_t,	orig_ino		)
+		__field(	uid_t,	uid			)
+		__field(	gid_t,	gid			)
+		__field(	__u16, mode			)
+	),
+
+	TP_fast_assign(
+		__entry->orig_ino = orig_ino;
+		__entry->dev	= inode->i_sb->s_dev;
+		__entry->ino	= inode->i_ino;
+		__entry->uid	= i_uid_read(inode);
+		__entry->gid	= i_gid_read(inode);
+		__entry->mode	= inode->i_mode;
+	),
+
+	TP_printk("dev %d,%d orig_ino %lu ino %lu mode 0%o uid %u gid %u",
+		  MAJOR(__entry->dev), MINOR(__entry->dev),
+		  (unsigned long) __entry->orig_ino,
+		  (unsigned long) __entry->ino, __entry->mode,
+		  __entry->uid, __entry->gid)
+);
+
 TRACE_EVENT(ext4_free_inode,
 	TP_PROTO(struct inode *inode),
 
