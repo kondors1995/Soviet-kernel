@@ -146,6 +146,8 @@ config ARCH_MSM8916
 	select ARCH_WANT_KMAP_ATOMIC_FLUSH
 	select MSM_RPM_LOG
 	select MSM_JTAGV8 if CORESIGHT_ETMV4
+	select RCU_BOOST if DEBUG_KMEMLEAK
+	select HAS_MACH_MEMUTILS
 
 config ARCH_FSM9900
 	bool "FSM9900"
@@ -1076,7 +1078,7 @@ config HUAWEI_FEATURE_NFF
 	depends on HUAWEI_KERNEL
         default n
 	help
-	  in debug mode,you can use sysrq and dump mode 	 
+	  in debug mode,you can use sysrq and dump mode
 
 config HUAWEI_THERMAL
 	bool "Use huawei thermal code"
@@ -1159,5 +1161,11 @@ config MSM_SLEEPER
 	default y
 	help
 	  CPU hotplug driver
+
+config HAS_MACH_MEMUTILS
+	default n
+	bool "Motorola MSM memcpy enhancements"
+	help
+	Faster memcpy performance for MSM8916.
 
 endif
