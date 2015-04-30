@@ -110,7 +110,6 @@ static int msm_comm_get_mbs_per_sec(struct msm_vidc_inst *inst)
 
 	ctrl.id = V4L2_CID_MPEG_VIDC_VIDEO_OPERATING_RATE;
 	rc = v4l2_g_ctrl(&inst->ctrl_handler, &ctrl);
-
 	if (!rc && ctrl.value) {
 		fps = (ctrl.value >> 16)? ctrl.value >> 16: 1;
 		return max(output_port_mbs, capture_port_mbs) * fps;
