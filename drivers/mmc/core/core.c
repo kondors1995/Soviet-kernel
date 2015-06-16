@@ -3137,8 +3137,10 @@ static bool mmc_is_vaild_state_for_clk_scaling(struct mmc_host *host)
 	 * this mode.
 	 */
 	if (!card || (mmc_card_mmc(card) &&
-			card->part_curr == EXT_CSD_PART_CONFIG_ACC_RPMB)
-			|| host->clk_scaling.invalid_state)
+		card->part_curr == EXT_CSD_PART_CONFIG_ACC_RPMB) ||
+		(host->clk_scaling.invalid_state &&
+		!(state == MMC_LOAD_LOW &&
+		host->clk_scaling.scale_down_in_low_wr_load)))
 		goto out;
 
 	if (mmc_send_status(card, &status)) {
@@ -3395,7 +3397,7 @@ static int mmc_rescan_try_freq(struct mmc_host *host, unsigned freq)
 int _mmc_detect_card_removed(struct mmc_host *host)
 {
 	int ret;
-	
+
 #ifdef CONFIG_HUAWEI_SDCARD_DSM
 	int i;
 
@@ -3405,7 +3407,7 @@ int _mmc_detect_card_removed(struct mmc_host *host)
 		{
 			dsm_sdcard_cmd_logs[i].value = 0;
 		}
-		
+
 	}
 #endif
 
@@ -4132,7 +4134,7 @@ static int __init mmc_init(void)
             dentry_mmclog, NULL, &debug_mask_fops);
     }
 #endif
-  
+
 	return 0;
 
 unregister_host_class:
