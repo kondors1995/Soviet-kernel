@@ -67,6 +67,8 @@ static void do_partner_start_event(struct work_struct *work);
 static void do_partner_stop_event(struct work_struct *work);
 static void do_partner_suspend_event(struct work_struct *work);
 static void do_partner_resume_event(struct work_struct *work);
+/* Boolean to detect if pm has entered suspend mode */
+static bool suspended;
 
 /* Trap into the TrustZone, and call funcs there. */
 static int __secure_tz_reset_entry2(unsigned int *scm_data, u32 size_scm_data,
@@ -389,6 +391,8 @@ static int tz_suspend(struct devfreq *devfreq)
 	unsigned long freq;
         unsigned int scm_data[2] = {0, 0};
         __secure_tz_reset_entry2(scm_data, sizeof(scm_data), priv->is_64);
+
+	suspended = true;
 
 	suspended = true;
 
