@@ -23,6 +23,7 @@
 #include <linux/state_notifier.h>
 #include <asm/cacheflush.h>
 #include <soc/qcom/scm.h>
+#include <linux/powersuspend.h>
 #include "governor.h"
 #ifdef CONFIG_ADRENO_IDLER
 #include "adreno_idler.h"
@@ -68,7 +69,7 @@ static void do_partner_stop_event(struct work_struct *work);
 static void do_partner_suspend_event(struct work_struct *work);
 static void do_partner_resume_event(struct work_struct *work);
 /* Boolean to detect if pm has entered suspend mode */
-static bool suspended;
+static bool suspended = false;
 
 /* Trap into the TrustZone, and call funcs there. */
 static int __secure_tz_reset_entry2(unsigned int *scm_data, u32 size_scm_data,
@@ -201,23 +202,16 @@ static int tz_get_target_freq(struct devfreq *devfreq, unsigned long *freq,
 	}
 
 	*freq = stats.current_frequency;
+	*flag = 0;
 
 	/*
 	 * Force to use & record as min freq when system has
 	 * entered pm-suspend or screen-off state.
 	 */
-	if (suspended || state_suspended) {
+	if (suspended || power_suspended) {
 		*freq = devfreq->profile->freq_table[devfreq->profile->max_state - 1];
 		return 0;
 	}
-
-#ifdef CONFIG_ADRENO_IDLER
-	if (adreno_idler_active &&
-			adreno_idler(stats, devfreq, freq)) {
-		/* adreno_idler has asked to bail out now */
-		return 0;
-	}
-#endif
 
 	priv->bin.total_time += stats.total_time;
 	priv->bin.busy_time += stats.busy_time;
@@ -389,16 +383,15 @@ static int tz_suspend(struct devfreq *devfreq)
 	struct devfreq_msm_adreno_tz_data *priv = devfreq->data;
 	struct devfreq_dev_profile *profile = devfreq->profile;
 	unsigned long freq;
-        unsigned int scm_data[2] = {0, 0};
-        __secure_tz_reset_entry2(scm_data, sizeof(scm_data), priv->is_64);
-
-	suspended = true;
 
 	suspended = true;
 
 	priv->bin.total_time = 0;
 	priv->bin.busy_time = 0;
-	
+	priv->bus.total_time = 0;
+	priv->bus.gpu_time = 0;
+	priv->bus.ram_time = 0;
+
 	freq = profile->freq_table[profile->max_state - 1];
 
 	return profile->target(devfreq->dev.parent, &freq, 0);
