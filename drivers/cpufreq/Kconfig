@@ -164,6 +164,12 @@ config CPU_FREQ_DEFAULT_GOV_BIOSHOCK
 	help
 	  Default governor of BioShock kernel
 
+config CPU_FREQ_DEFAULT_GOV_PEGASUSQ
+	bool "pegasusq"
+	select CPU_FREQ_GOV_PEGASUSQ
+	help
+	Use the CPUFreq governor 'pegasusq' as default.
+
 config CPU_FREQ_DEFAULT_GOV_INTELLIDEMAND
  	bool "intellidemand"
  	select CPU_FREQ_GOV_INTELLIDEMAND
@@ -317,6 +323,9 @@ config CPU_FREQ_GOV_BIOSHOCK
 config CPU_FREQ_GOV_BARRY_ALLEN
 	tristate "'barry_allen' cpufreq policy governor"
 	help
+
+config CPU_FREQ_GOV_PEGASUSQ
+	tristate "'pegasusq' cpufreq policy governor"
 
 
 config CPU_FREQ_GOV_CONSERVATIVE
