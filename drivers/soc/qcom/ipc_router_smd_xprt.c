@@ -1,3 +1,4 @@
+
 /* Copyright (c) 2011-2015, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,7 +28,6 @@
 #include <soc/qcom/smd.h>
 #include <soc/qcom/smsm.h>
 #include <soc/qcom/subsystem_restart.h>
-#include <sound/hw_audio_info.h>
 
 static int msm_ipc_router_smd_xprt_debug_mask;
 module_param_named(debug_mask, msm_ipc_router_smd_xprt_debug_mask,
@@ -960,3 +960,4 @@ static int __init msm_ipc_router_smd_xprt_init(void)
 module_init(msm_ipc_router_smd_xprt_init);
 MODULE_DESCRIPTION("IPC Router SMD XPRT");
 MODULE_LICENSE("GPL v2");
+
