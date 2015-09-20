@@ -53,6 +53,7 @@
 #ifdef	__KERNEL__
 struct lis3dh_acc_platform_data {
 	int poll_interval;
+	int init_interval;
 	int min_interval;
 
 	u8 g_range;
@@ -64,6 +65,7 @@ struct lis3dh_acc_platform_data {
 	u8 negate_x;
 	u8 negate_y;
 	u8 negate_z;
+	bool enable_int;
 
 	int (*init)(void);
 	void (*exit)(void);
@@ -282,6 +284,8 @@ struct lis3dh_acc_data {
 	int hw_working;
 	atomic_t enabled;
 	int on_before_suspend;
+	int pre_enable;
+	bool use_cal;
 
 	u8 sensitivity;
 
@@ -313,6 +317,16 @@ struct lis3dh_acc_data {
 	char* dsm_buf;          						/* buf to record error or exception */
 #endif
 
+	int cal_params[3];
+	bool use_batch;
+	unsigned int delay_ms;
+	unsigned int batch_mode;
+	unsigned int fifo_timeout_ms;
+	unsigned int flush_count;
+	atomic_t cal_status;
+
+	struct workqueue_struct *data_wq;
+	char calibrate_buf[99];
 
 };
 
