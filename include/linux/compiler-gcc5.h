@@ -79,6 +79,7 @@
  * massaged by 'flags = ptr & 3; ptr &= ~3;').
  */
 #define __assume_aligned(a, ...) __attribute__((__assume_aligned__(a, ## __VA_ARGS__)))
+#endif
 
 /*
  * GCC 'asm goto' miscompiles certain code sequences:
