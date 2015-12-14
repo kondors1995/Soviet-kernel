@@ -139,7 +139,6 @@ struct sensors_classdev {
 	int			fifo_max_event_count;
 	int32_t			max_delay;
 	uint32_t		flags;
-
 	unsigned int		enabled;
 	unsigned int		delay_msec;
 	unsigned int		wakeup;
