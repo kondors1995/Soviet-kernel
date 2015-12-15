@@ -362,8 +362,11 @@ static struct kgsl_cmdbatch *_get_cmdbatch(struct adreno_context *drawctxt)
 		 * If syncpoints are pending start the canary timer if
 		 * it hasn't already been started
 		 */
-		if (!timer_pending(&cmdbatch->timer))
-			mod_timer(&cmdbatch->timer, jiffies + (5 * HZ));
+		if (!cmdbatch->timeout_jiffies) {
+			cmdbatch->timeout_jiffies =
+				jiffies + msecs_to_jiffies(5000);
+			mod_timer(&cmdbatch->timer, cmdbatch->timeout_jiffies);
+		}
 
 		return ERR_PTR(-EAGAIN);
 	}
