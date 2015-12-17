@@ -58,11 +58,8 @@ MODULE_AUTHOR("Eli Billauer");
 module_param(frandom_bufsize, int, 0);
 module_param(frandom_chunklimit, int, 0);
 
-MODULE_PARM_DESC(frandom_bufsize,
-	"Internal buffer size in bytes. Default is 256. Must be >= 256");
-MODULE_PARM_DESC(frandom_chunklimit,
-	"Limit for read() blocks size. 0 (default) is unlimited,"
-	"otherwise must be >= 256");
+MODULE_PARM_DESC(frandom_bufsize,"Internal buffer size in bytes. Default is 256. Must be >= 256");
+MODULE_PARM_DESC(frandom_chunklimit,"Limit for read() blocks size. 0 (default) is unlimited, otherwise must be >= 256");
 
 struct frandom_state {
 	struct semaphore sem; /* Semaphore on the state structure */
@@ -284,8 +281,7 @@ static const struct file_operations frandom_fops = {
 	.release	= frandom_release,
 };
 
-static void frandom_cleanup_module(void)
-{
+static void frandom_cleanup_module(void) {
 	device_destroy(frandom_class, erandom_devt);
 	cdev_del(&erandom_cdev);
 	device_destroy(frandom_class, frandom_devt);
@@ -344,11 +340,10 @@ static int frandom_init_module(void)
 	 * fops in frandom_cleanup_module()
 	 */
 
-	result = alloc_chrdev_region(&frandom_devt, 0, NR_FRANDOM_DEVS,
-		"frandom");
+	result = alloc_chrdev_region(&frandom_devt, 0, NR_FRANDOM_DEVS, "frandom");
 	if (result < 0) {
-		pr_warn("frandom: failed to alloc frandom region\n");
-		goto error1;
+		printk(KERN_WARNING "frandom: failed to alloc frandom region\n");
+	  goto error1;
 	}
 
 	frandom_minor = MINOR(frandom_devt);
@@ -359,12 +354,11 @@ static int frandom_init_module(void)
 	frandom_cdev.owner = THIS_MODULE;
 	result = cdev_add(&frandom_cdev, frandom_devt, 1);
 	if (result) {
-		pr_warn("frandom: Failed to add cdev for /dev/frandom\n");
-		goto error2;
+	  printk(KERN_WARNING "frandom: Failed to add cdev for /dev/frandom\n");
+	  goto error2;
 	}
 
-	frandom_device = device_create(frandom_class, NULL, frandom_devt,
-		NULL, "frandom");
+	frandom_device = device_create(frandom_class, NULL, frandom_devt, NULL, "frandom");
 
 	if (IS_ERR(frandom_device)) {
 		pr_warn("frandom: Failed to create frandom device\n");
@@ -379,11 +373,10 @@ static int frandom_init_module(void)
 		goto error4;
 	}
 
-	erandom_device = device_create(frandom_class, NULL, erandom_devt,
-		NULL, "erandom");
+	erandom_device = device_create(frandom_class, NULL, erandom_devt, NULL, "erandom");
 
 	if (IS_ERR(erandom_device)) {
-		pr_warn("frandom: Failed to create erandom device\n");
+		printk(KERN_WARNING "frandom: Failed to create erandom device\n");
 		goto error5;
 	}
 	return 0; /* succeed */
@@ -402,8 +395,10 @@ error0:
 	kfree(erandom_state->buf);
 	kfree(erandom_state);
 
-	return result;
+    return result;
 }
 
 module_init(frandom_init_module);
 module_exit(frandom_cleanup_module);
+
+EXPORT_SYMBOL(erandom_get_random_bytes);
