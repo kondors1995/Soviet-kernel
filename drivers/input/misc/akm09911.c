@@ -759,6 +759,7 @@ static void AKECS_SetYPR(
 	int *rbuf)
 {
 	uint32_t ready;
+	struct timespec ts;
 	dev_vdbg(&akm->i2c->dev, "%s: flag =0x%X", __func__, rbuf[0]);
 	dev_vdbg(&akm->input->dev, "  Acc [LSB]   : %6d,%6d,%6d stat=%d",
 		rbuf[1], rbuf[2], rbuf[3], rbuf[4]);
@@ -806,6 +807,9 @@ static void AKECS_SetYPR(
 		input_report_abs(akm->input, ABS_VOLUME, rbuf[15]);
 	}
 
+	get_monotonic_boottime(&ts);
+	input_event(akm->input, EV_SYN, SYN_TIME_SEC, ts.tv_sec);
+	input_event(akm->input, EV_SYN, SYN_TIME_NSEC, ts.tv_nsec);
 	input_sync(akm->input);
 }
 
@@ -2307,6 +2311,7 @@ static int akm_report_data(struct akm_compass_data *akm)
 	int ret;
 	int mag_x, mag_y, mag_z;
 	int tmp;
+	struct timespec ts;
 	ktime_t timestamp;
 
 	ret = AKECS_GetData_Poll(akm, dat_buf, AKM_SENSOR_DATA_SIZE);
@@ -2390,6 +2395,7 @@ static int akm_report_data(struct akm_compass_data *akm)
 #endif
 	}
 
+	get_monotonic_boottime(&ts);
 	input_report_abs(akm->input, ABS_X, mag_x);
 	input_report_abs(akm->input, ABS_Y, mag_y);
 	input_report_abs(akm->input, ABS_Z, mag_z);
@@ -2403,7 +2409,8 @@ static int akm_report_data(struct akm_compass_data *akm)
 	akm->last_x = mag_x;
 	akm->last_y = mag_y;
 	akm->last_z = mag_z;
-
+	input_event(akm->input, EV_SYN, SYN_TIME_SEC, ts.tv_sec);
+	input_event(akm->input, EV_SYN, SYN_TIME_NSEC, ts.tv_nsec);
 	input_sync(akm->input);
 
 #ifdef CONFIG_HUAWEI_DSM
