@@ -111,6 +111,10 @@ dtb-$(CONFIG_ARCH_MSM8916) += \
 endif
 ifeq ($(CONFIG_SUPPORT_Y635),y)
 dtb-$(CONFIG_ARCH_MSM8916) += \
+	huawei_y635_cl_va.dtb \
+	huawei_y635_tl_va.dtb \
+	huawei_y635_cl_va_512M.dtb \
+	huawei_y635_tl_va_512M.dtb \
 	huawei_y635_l01_va.dtb \
 	huawei_y635_l02_va.dtb \
 	huawei_y635_l03_va.dtb \
