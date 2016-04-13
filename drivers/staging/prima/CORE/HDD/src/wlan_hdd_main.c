@@ -4519,8 +4519,6 @@ static VOS_STATUS hdd_parse_ese_beacon_req(tANI_U8 *pValue,
     input = VOS_MIN(input, SIR_ESE_MAX_MEAS_IE_REQS);
     pEseBcnReq->numBcnReqIe = input;
 
-    hddLog(LOG1, "Number of Bcn Req Ie fields: %d", pEseBcnReq->numBcnReqIe);
-
     VOS_TRACE( VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_INFO_HIGH,
                "Number of Bcn Req Ie fields(%d)", pEseBcnReq->numBcnReqIe);
 
@@ -8334,7 +8332,7 @@ void hdd_wlan_exit(hdd_context_t *pHddCtx)
 
    // Unregister the Net Device Notifier
    //unregister_netdevice_notifier(&hdd_netdev_notifier);
-   
+
    //hdd_stop_all_adapters( pHddCtx );
 
 #ifdef WLAN_BTAMP_FEATURE
