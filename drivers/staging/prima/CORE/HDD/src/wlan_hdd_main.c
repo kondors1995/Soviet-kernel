@@ -8328,9 +8328,9 @@ void hdd_wlan_exit(hdd_context_t *pHddCtx)
    hdd_debugfs_exit(pHddCtx);
 
    // Unregister the Net Device Notifier
-   unregister_netdevice_notifier(&hdd_netdev_notifier);
+   //unregister_netdevice_notifier(&hdd_netdev_notifier);
    
-   hdd_stop_all_adapters( pHddCtx );
+   //hdd_stop_all_adapters( pHddCtx );
 
 #ifdef WLAN_BTAMP_FEATURE
    vosStatus = WLANBAP_Stop(pVosContext);
@@ -9546,6 +9546,7 @@ int hdd_wlan_startup(struct device *dev )
    }
 
    // register net device notifier for device change notification
+/*
    ret = register_netdevice_notifier(&hdd_netdev_notifier);
 
    if(ret < 0)
@@ -9553,12 +9554,13 @@ int hdd_wlan_startup(struct device *dev )
       hddLog(VOS_TRACE_LEVEL_ERROR,"%s: register_netdevice_notifier failed",__func__);
       goto err_free_power_on_lock;
    }
+*/
 
    //Initialize the nlink service
    if(nl_srv_init() != 0)
    {
       hddLog(VOS_TRACE_LEVEL_FATAL,"%s: nl_srv_init failed", __func__);
-      goto err_reg_netdev;
+      goto err_nl_srv;
    }
 
 #ifdef WLAN_KD_READY_NOTIFIER
@@ -9702,8 +9704,8 @@ err_nl_srv:
 #else
    nl_srv_exit();
 #endif /* WLAN_KD_READY_NOTIFIER */
-err_reg_netdev:
-   unregister_netdevice_notifier(&hdd_netdev_notifier);
+//err_reg_netdev:
+//   unregister_netdevice_notifier(&hdd_netdev_notifier);
 
 err_free_power_on_lock:
    free_riva_power_on_lock("wlan");
