@@ -927,17 +927,17 @@ int log_to_jank(char* tag, int prio, const char* fmt, ...)
 {
 	struct logger_log *log = get_log_from_name(LOGGER_LOG_JANK);
 	struct logger_entry header;
-	
+
 	char  msg[MAX_MSG_SIZE];
 	struct timespec now;
 	va_list args;
 	ssize_t ret = 0;
-	
+
 	struct iovec vec[3];
-	struct iovec *iov = vec;	
-	
+	struct iovec *iov = vec;
+
 	int nr_segs = sizeof(vec)/sizeof(vec[0]);
-	if (unlikely(!tag || !fmt)) {    
+	if (unlikely(!tag || !fmt)) {
         pr_err("jank_log: invalid arguments\n");
         return 0;
     }
@@ -953,7 +953,7 @@ int log_to_jank(char* tag, int prio, const char* fmt, ...)
 
 	vec[1].iov_base   = (void *)tag;
 	vec[1].iov_len    =  strlen(tag) + 1;
-	
+
 	vec[2].iov_base   = (void *) msg;
 	vec[2].iov_len    = strlen(msg) + 1;
 
@@ -965,7 +965,7 @@ int log_to_jank(char* tag, int prio, const char* fmt, ...)
 	header.euid = current_euid();
 	header.len = min(calc_iovc_ki_left(vec,nr_segs),LOGGER_ENTRY_MAX_PAYLOAD);
 	header.hdr_size = sizeof(struct logger_entry);
-	    
+
 	/* null writes succeed, return zero */
 	if (unlikely(!header.len))
 		return 0;
@@ -981,7 +981,7 @@ int log_to_jank(char* tag, int prio, const char* fmt, ...)
 	fix_up_readers(log,  sizeof(struct logger_entry) + header.len);
 	do_write_log(log, &header, sizeof(struct logger_entry));
 	while (nr_segs-- > 0) {
-		size_t len;		
+		size_t len;
 		/* figure out how much of this vector we can keep */
 		len = min_t(size_t, iov->iov_len, header.len - ret);
 		/* write out this segment's payload */
@@ -989,7 +989,7 @@ int log_to_jank(char* tag, int prio, const char* fmt, ...)
 
 		iov++;
 		ret += len;
-		
+
 	}
 
 	mutex_unlock(&log->mutex);
@@ -1009,20 +1009,20 @@ static int __init logger_init(void)
 #if defined(CONFIG_HUAWEI_KERNEL)
 	struct logger_log *log;
 #endif
-	
-	ret = create_log(LOGGER_LOG_MAIN, CONFIG_LOGCAT_SIZE*1024);
+
+	ret = create_log(LOGGER_LOG_MAIN, CONFIG_LOGCAT_SIZE*512);
 	if (unlikely(ret))
 		goto out;
 
-	ret = create_log(LOGGER_LOG_EVENTS, CONFIG_LOGCAT_SIZE*1024);
+	ret = create_log(LOGGER_LOG_EVENTS, CONFIG_LOGCAT_SIZE*512);
 	if (unlikely(ret))
 		goto out;
 
-	ret = create_log(LOGGER_LOG_RADIO, CONFIG_LOGCAT_SIZE*1024);
+	ret = create_log(LOGGER_LOG_RADIO, CONFIG_LOGCAT_SIZE*512);
 	if (unlikely(ret))
 		goto out;
 
-	ret = create_log(LOGGER_LOG_SYSTEM, CONFIG_LOGCAT_SIZE*1024);
+	ret = create_log(LOGGER_LOG_SYSTEM, CONFIG_LOGCAT_SIZE*512);
 	if (unlikely(ret))
 		goto out;
 #ifdef CONFIG_HUAWEI_KERNEL
