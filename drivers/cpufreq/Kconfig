@@ -132,7 +132,10 @@ config CPU_FREQ_DEFAULT_GOV_ZZMOOVE
 	  select CPU_FREQ_GOV_ZZMOOVE
 	  select CPU_FREQ_GOV_PERFORMANCE
 	  help
-	 
+
+config CPU_FREQ_DEFAULT_GOV_DARKNESS
+	bool "darkness"
+    select CPU_FREQ_GOV_DARKNESS 	 
 
 endchoice
 
@@ -221,6 +224,9 @@ config CPU_FREQ_GOV_ZZMOOVE
 	depends on CPU_FREQ
 	help
 	  
+config CPU_FREQ_GOV_DARKNESS
+	tristate "'darkness' cpufreq policy governor"	  
+	depends on CPU_FREQ
 
 config CPU_FREQ_GOV_CONSERVATIVE
 	tristate "'conservative' cpufreq governor"
