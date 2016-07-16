@@ -669,6 +669,14 @@ config MSM_RPC_LOOPBACK_XPRT
 	  Support for routing RPC messages between APPS clients
 	  and APPS servers.  Helps in testing APPS RPC framework.
 
+config ZEN_DECISION
+	bool "Zen Decision: MSM Userspace Handler"
+	depends on SMP && FB
+	default n
+	help
+	  MSM/Qcomm devices have multiple userspace applications that handle
+	  CPU hotplugging and frequency operations.
+
 config RTAC
 	bool "MSM8K real-time audio calibration support"
 	default y
