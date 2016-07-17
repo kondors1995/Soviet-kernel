@@ -1154,4 +1154,10 @@ config SUPPORT_Y635
 	depends on HUAWEI_KERNEL && ARCH_MSM8916
 	default n
 
+config MSM_SLEEPER
+	bool "CPU hotplug driver"
+	default y
+	help
+	  CPU hotplug driver
+
 endif
