@@ -680,11 +680,11 @@ config ZEN_DECISION
 	  ZenDecision is a "handler" to account for behavior caused by
 	  disabling some of these services.
 
-	  For example, If MPDecision is disabled and MSM-Thermal_Engine is 
+	  For example, If MPDecision is disabled and MSM-Thermal_Engine is
 	  enabled in the userspace. Situations where CPUs go offline but never
 	  come back online occur. ZenDecision handles the situation of CPUs
 	  never coming online when they are supposed.
-  
+
 	  ZenDecision ensures all CPUs are online when they are supposed to be by:
 	  - Enable all CPUs when screen comes on after wake_wait_delay
 	  - Ignore all CPU_UP operations when battery level is <= 15% to respect
@@ -1101,7 +1101,7 @@ config HUAWEI_FEATURE_NFF
 	depends on HUAWEI_KERNEL
         default n
 	help
-	  in debug mode,you can use sysrq and dump mode 	 
+	  in debug mode,you can use sysrq and dump mode
 
 config HUAWEI_THERMAL
 	bool "Use huawei thermal code"
@@ -1184,4 +1184,5 @@ config MSM_SLEEPER
 	default y
 	help
 	  CPU hotplug driver
+
 endif
