@@ -3,7 +3,7 @@ echo Do you want to clean?
 read REPLY1
 if [[ $REPLY1 =~ ^[Yy]$ ]]
 then
-
+    
     make clean && make mrproper
     git reset --hard
     echo Do you want to compile kernel?

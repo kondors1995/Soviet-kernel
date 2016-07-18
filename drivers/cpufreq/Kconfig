@@ -152,6 +152,13 @@ config CPU_FREQ_DEFAULT_GOV_HYPER
 	select CPU_FREQ_GOV_HYPER
     help
 
+config CPU_FREQ_DEFAULT_GOV_BIOSHOCK
+	bool "BioShock"
+	select CPU_FREQ_GOV_BIOSHOCK
+	help
+	  Default governor of BioShock kernel
+
+
 endchoice
 
 config CPU_FREQ_GOV_PERFORMANCE
@@ -254,6 +261,13 @@ config CPU_FREQ_GOV_ALUCARD
 config CPU_FREQ_GOV_HYPER
 	tristate "'HYPER' cpufreq governor"
     depends on CPU_FREQ
+
+config CPU_FREQ_GOV_BIOSHOCK
+	tristate "'bioshock' cpufreq bioshock"
+	depends on CPU_FREQ
+	help
+	  'bioshock' - More aggressive version of conservative
+
 
 config CPU_FREQ_GOV_CONSERVATIVE
 	tristate "'conservative' cpufreq governor"
