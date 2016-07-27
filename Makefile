@@ -392,6 +392,7 @@ KBUILD_CFLAGS   :=$(GRAPHITE) -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
  		   -Wno-misleading-indentation \
  		   -Wno-shift-overflow \
  		   -Wno-bool-compare \
+                   -march=armv8-a+crc -mtune=cortex-a57.cortex-a53 -mcpu=cortex-a57.cortex-a53 \
 		   -fno-delete-null-pointer-checks -fgnu89-inline\
 		   -fmodulo-sched -fmodulo-sched-allow-regmoves -fno-tree-vectorize -ffast-math \
        -funswitch-loops -fpredictive-commoning -fgcse-after-reload \
