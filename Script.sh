@@ -12,14 +12,14 @@ then
         if [[ $REPLY2 =~ ^[Yy]$ ]]
         then
             export ARCH=arm
-            export CROSS_COMPILE=~/Android/Kernel/toolchains/UBERTC-arm-eabi-4.9/bin/arm-eabi-
+            export CROSS_COMPILE=~/Android/Kernel/toolchains/UBERTC-arm-eabi-6.0/bin/arm-eabi-
             make g620s_defconfig
             echo "Enter number of threads: "
             read input_variable
             echo "You entered: $input_variable"
             make -j$input_variable
-            cp arch/arm/boot/zImage '/home/quagmire/Desktop/BUILD'
-            find . -name '*ko' -exec cp '{}' '/home/quagmire/Desktop/BUILD' \;
+            cp arch/arm/boot/zImage '/home/quagmire/Android/Kernel/Anykernel/AnyKernel2'
+            find . -name '*ko' -exec cp '{}' '/home/quagmire/Android/Kernel/Anykernel/AnyKernel2/modules' \;
                 
         fi
 
@@ -33,14 +33,14 @@ then
         then
                 
             export ARCH=arm
-            export CROSS_COMPILE=~/Android/Kernel/toolchains/UBERTC-arm-eabi-4.9/bin/arm-eabi-
+            export CROSS_COMPILE=~/Android/Kernel/toolchains/UBERTC-arm-eabi-6.0/bin/arm-eabi-
             make g620s_defconfig
             echo "Enter number of threads: "
             read input_variable
             echo "You entered: $input_variable"
             make -j$input_variable
-            cp arch/arm/boot/zImage '/home/quagmire/Desktop/BUILD'
-            find . -name '*ko' -exec cp '{}' '/home/quagmire/Desktop/BUILD' \;
+            cp arch/arm/boot/zImage '/home/quagmire/Android/Kernel/Anykernel/AnyKernel2'
+            find . -name '*ko' -exec cp '{}' '/home/quagmire/Android/Kernel/Anykernel/AnyKernel2/modules' \;
 
         fi
 fi
