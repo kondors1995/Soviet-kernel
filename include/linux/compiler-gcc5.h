@@ -40,31 +40,12 @@
 #define unreachable() __builtin_unreachable()
 
 /* Mark a function definition as prohibited from being cloned. */
-#define __noclone	__attribute__((__noclone__, __optimize__("no-tracer")))
+#define __noclone	__attribute__((__noclone__))
 
 /*
- * When used with Link Time Optimization, gcc can optimize away C functions or
- * variables which are referenced only from assembly code.  __visible tells the
- * optimizer that something else uses this function or variable, thus preventing
- * this.
+ * Tell the optimizer that something else uses this function or variable.
  */
 #define __visible __attribute__((externally_visible))
-
-#ifndef __CHECKER__
-/*
- * __assume_aligned(n, k): Tell the optimizer that the returned
- * pointer can be assumed to be k modulo n. The second argument is
- * optional (default 0), so we use a variadic macro to make the
- * shorthand.
- *
- * Beware: Do not apply this to functions which may return
- * ERR_PTRs. Also, it is probably unwise to apply it to functions
- * returning extra information in the low bits (but in that case the
- * compiler should see some alignment anyway, when the return value is
- * massaged by 'flags = ptr & 3; ptr &= ~3;').
- */
-#define __assume_aligned(a, ...) __attribute__((__assume_aligned__(a, ## __VA_ARGS__)))
-#endif
 
 /*
  * GCC 'asm goto' miscompiles certain code sequences:
@@ -72,6 +53,7 @@
  *   http://gcc.gnu.org/bugzilla/show_bug.cgi?id=58670
  *
  * Work it around via a compiler barrier quirk suggested by Jakub Jelinek.
+ * Fixed in GCC 4.8.2 and later versions.
  *
  * (asm goto is automatically volatile - the naming reflects this.)
  */
@@ -82,4 +64,3 @@
 #define __HAVE_BUILTIN_BSWAP64__
 #define __HAVE_BUILTIN_BSWAP16__
 #endif /* CONFIG_ARCH_USE_BUILTIN_BSWAP */
-
