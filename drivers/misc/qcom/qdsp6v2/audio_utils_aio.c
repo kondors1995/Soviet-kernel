@@ -1465,7 +1465,310 @@ long audio_aio_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		mutex_unlock(&audio->lock);
 		break;
 	}
-	case AUDIO_GET_SESSION_ID: {
+	default:
+		pr_err("%s: Unknown ioctl cmd = %d", __func__, cmd);
+		rc =  -EINVAL;
+	}
+	return rc;
+}
+
+#ifdef CONFIG_COMPAT
+struct msm_audio_stream_config32 {
+	u32 buffer_size;
+	u32 buffer_count;
+};
+
+struct msm_audio_stats32 {
+	u32 byte_count;
+	u32 sample_count;
+	u32 unused[2];
+};
+
+struct msm_audio_config32 {
+	u32 buffer_size;
+	u32 buffer_count;
+	u32 channel_count;
+	u32 sample_rate;
+	u32 type;
+	u32 meta_field;
+	u32 bits;
+	u32 unused[3];
+};
+
+struct msm_audio_buf_cfg32 {
+	u32 meta_info_enable;
+	u32 frames_per_buf;
+};
+
+struct msm_audio_ion_info32 {
+	int fd;
+	compat_uptr_t vaddr;
+};
+
+enum {
+	AUDIO_GET_CONFIG_32 = _IOR(AUDIO_IOCTL_MAGIC, 3,
+			struct msm_audio_config32),
+	AUDIO_SET_CONFIG_32 = _IOW(AUDIO_IOCTL_MAGIC, 4,
+			struct msm_audio_config32),
+	AUDIO_GET_STATS_32 = _IOR(AUDIO_IOCTL_MAGIC, 5,
+			struct msm_audio_stats32),
+	AUDIO_GET_EVENT_32 = _IOR(AUDIO_IOCTL_MAGIC, 13,
+			struct msm_audio_event32),
+	AUDIO_ASYNC_WRITE_32 = _IOW(AUDIO_IOCTL_MAGIC, 17,
+			struct msm_audio_aio_buf32),
+	AUDIO_ASYNC_READ_32 = _IOW(AUDIO_IOCTL_MAGIC, 18,
+			struct msm_audio_aio_buf32),
+	AUDIO_SET_STREAM_CONFIG_32 = _IOW(AUDIO_IOCTL_MAGIC, 80,
+			struct msm_audio_stream_config32),
+	AUDIO_GET_STREAM_CONFIG_32 = _IOR(AUDIO_IOCTL_MAGIC, 81,
+			struct msm_audio_stream_config32),
+	AUDIO_GET_BUF_CFG_32 = _IOW(AUDIO_IOCTL_MAGIC, 93,
+			struct msm_audio_buf_cfg32),
+	AUDIO_SET_BUF_CFG_32 = _IOW(AUDIO_IOCTL_MAGIC, 94,
+			struct msm_audio_buf_cfg32),
+	AUDIO_REGISTER_ION_32 = _IOW(AUDIO_IOCTL_MAGIC, 97,
+			struct msm_audio_ion_info32),
+	AUDIO_DEREGISTER_ION_32 = _IOW(AUDIO_IOCTL_MAGIC, 98,
+			struct msm_audio_ion_info32),
+};
+
+static long audio_aio_compat_ioctl(struct file *file, unsigned int cmd,
+			unsigned long arg)
+{
+	struct q6audio_aio *audio = file->private_data;
+	int rc = 0;
+
+	switch (cmd) {
+	case AUDIO_ABORT_GET_EVENT:
+	case AUDIO_OUTPORT_FLUSH:
+	case AUDIO_STOP:
+	case AUDIO_PAUSE:
+	case AUDIO_FLUSH:
+	case AUDIO_GET_SESSION_ID:
+		rc = audio_aio_shared_ioctl(file, cmd, arg);
+		break;
+	case AUDIO_GET_STATS_32: {
+		struct msm_audio_stats32 stats;
+		uint64_t timestamp;
+		memset(&stats, 0, sizeof(struct msm_audio_stats32));
+		stats.byte_count = atomic_read(&audio->in_bytes);
+		stats.sample_count = atomic_read(&audio->in_samples);
+		rc = q6asm_get_session_time(audio->ac, &timestamp);
+		if (rc >= 0)
+			memcpy(&stats.unused[0], &timestamp, sizeof(timestamp));
+		else
+			pr_debug("Error while getting timestamp\n");
+		if (copy_to_user((void *)arg, &stats, sizeof(stats))) {
+			pr_err(
+				"%s: copy_to_user for AUDIO_GET_STATS_32 failed\n",
+				__func__);
+			rc = -EFAULT;
+		}
+		break;
+	}
+	case AUDIO_GET_EVENT_32: {
+		pr_debug("%s[%p]:AUDIO_GET_EVENT\n", __func__, audio);
+		if (mutex_trylock(&audio->get_event_lock)) {
+			rc = audio_aio_process_event_req_compat(audio,
+						(void __user *)arg);
+			mutex_unlock(&audio->get_event_lock);
+		} else
+			rc = -EBUSY;
+		break;
+	}
+	case AUDIO_ASYNC_WRITE_32: {
+		mutex_lock(&audio->write_lock);
+		if (audio->drv_status & ADRV_STATUS_FSYNC)
+			rc = -EBUSY;
+		else {
+			if (audio->enabled)
+				rc = audio_aio_buf_add_compat(audio, 1,
+						(void __user *)arg);
+			else
+				rc = -EPERM;
+		}
+		mutex_unlock(&audio->write_lock);
+		break;
+	}
+	case AUDIO_ASYNC_READ_32: {
+		mutex_lock(&audio->read_lock);
+		if (audio->feedback)
+			rc = audio_aio_buf_add_compat(audio, 0,
+					(void __user *)arg);
+		else
+			rc = -EPERM;
+		mutex_unlock(&audio->read_lock);
+		break;
+	}
+
+	case AUDIO_GET_STREAM_CONFIG_32: {
+		struct msm_audio_stream_config32 cfg;
+		mutex_lock(&audio->lock);
+		memset(&cfg, 0, sizeof(cfg));
+		cfg.buffer_size = audio->str_cfg.buffer_size;
+		cfg.buffer_count = audio->str_cfg.buffer_count;
+		pr_debug("%s[%p]:GET STREAM CFG %d %d\n",
+			__func__, audio, cfg.buffer_size, cfg.buffer_count);
+		if (copy_to_user((void *)arg, &cfg, sizeof(cfg))) {
+			pr_err("%s: copy_to_user for AUDIO_GET_STREAM_CONFIG_32 failed\n",
+				__func__);
+			rc = -EFAULT;
+		}
+		mutex_unlock(&audio->lock);
+		break;
+	}
+	case AUDIO_SET_STREAM_CONFIG_32: {
+		struct msm_audio_stream_config32 cfg_32;
+		struct msm_audio_stream_config cfg;
+		pr_debug("%s[%p]:SET STREAM CONFIG\n", __func__, audio);
+		mutex_lock(&audio->lock);
+		if (copy_from_user(&cfg_32, (void *)arg, sizeof(cfg_32))) {
+			pr_err("%s: copy_from_user for AUDIO_SET_STREAM_CONFIG_32 failed\n",
+				__func__);
+			rc = -EFAULT;
+			mutex_unlock(&audio->lock);
+			break;
+		}
+		cfg.buffer_size = cfg_32.buffer_size;
+		cfg.buffer_count = cfg_32.buffer_count;
+
+		audio->str_cfg.buffer_size = FRAME_SIZE;
+		audio->str_cfg.buffer_count = FRAME_NUM;
+		rc = 0;
+		mutex_unlock(&audio->lock);
+		break;
+	}
+	case AUDIO_GET_CONFIG_32: {
+		struct msm_audio_config32 cfg_32;
+		mutex_lock(&audio->lock);
+		memset(&cfg_32, 0, sizeof(cfg_32));
+		cfg_32.buffer_size = audio->pcm_cfg.buffer_size;
+		cfg_32.buffer_count = audio->pcm_cfg.buffer_count;
+		cfg_32.channel_count = audio->pcm_cfg.channel_count;
+		cfg_32.sample_rate = audio->pcm_cfg.sample_rate;
+		cfg_32.type = audio->pcm_cfg.type;
+		cfg_32.meta_field = audio->pcm_cfg.meta_field;
+		cfg_32.bits = audio->pcm_cfg.bits;
+
+		if (copy_to_user((void *)arg, &cfg_32, sizeof(cfg_32))) {
+			pr_err("%s: copy_to_user for AUDIO_GET_CONFIG_32 failed\n",
+				__func__);
+			rc = -EFAULT;
+		}
+		mutex_unlock(&audio->lock);
+		break;
+	}
+	case AUDIO_SET_CONFIG_32: {
+		struct msm_audio_config config;
+		struct msm_audio_config32 config_32;
+		mutex_lock(&audio->lock);
+
+		if (audio->feedback != NON_TUNNEL_MODE) {
+			pr_err("%s[%p]:Not sufficient permission to change the playback mode\n",
+				 __func__, audio);
+			rc = -EACCES;
+			mutex_unlock(&audio->lock);
+			break;
+		}
+		pr_err("%s[%p]:AUDIO_SET_CONFIG\n", __func__, audio);
+		if (copy_from_user(&config_32, (void *)arg,
+					sizeof(config_32))) {
+			pr_err("%s: copy_from_user for AUDIO_SET_CONFIG_32 failed\n",
+				__func__);
+			rc = -EFAULT;
+			mutex_unlock(&audio->lock);
+			break;
+		}
+		config.buffer_size = config_32.buffer_size;
+		config.buffer_count = config_32.buffer_count;
+		config.channel_count = config_32.channel_count;
+		config.sample_rate = config_32.sample_rate;
+		config.type = config_32.type;
+		config.meta_field = config_32.meta_field;
+		config.bits = config_32.bits;
+
+		if ((config.buffer_count > PCM_BUF_COUNT) ||
+			(config.buffer_count == 1))
+			config.buffer_count = PCM_BUF_COUNT;
+
+		if (config.buffer_size < PCM_BUFSZ_MIN)
+			config.buffer_size = PCM_BUFSZ_MIN;
+
+		audio->pcm_cfg.buffer_count = config.buffer_count;
+		audio->pcm_cfg.buffer_size = config.buffer_size;
+		audio->pcm_cfg.channel_count = config.channel_count;
+		audio->pcm_cfg.sample_rate = config.sample_rate;
+		rc = 0;
+		mutex_unlock(&audio->lock);
+		break;
+	}
+	case AUDIO_SET_BUF_CFG_32: {
+		struct msm_audio_buf_cfg cfg;
+		struct msm_audio_buf_cfg32 cfg_32;
+		mutex_lock(&audio->lock);
+		if (copy_from_user(&cfg_32, (void *)arg, sizeof(cfg_32))) {
+			pr_err("%s: copy_from_user for AUDIO_SET_CONFIG_32 failed\n",
+				__func__);
+			rc = -EFAULT;
+			mutex_unlock(&audio->lock);
+			break;
+		}
+		cfg.meta_info_enable = cfg_32.meta_info_enable;
+		cfg.frames_per_buf = cfg_32.frames_per_buf;
+
+		if ((audio->feedback == NON_TUNNEL_MODE) &&
+			!cfg.meta_info_enable) {
+			rc = -EFAULT;
+			mutex_unlock(&audio->lock);
+			break;
+		}
+
+		audio->buf_cfg.meta_info_enable = cfg.meta_info_enable;
+		pr_debug("%s[%p]:session id %d: Set-buf-cfg: meta[%d]",
+				__func__, audio,
+				audio->ac->session, cfg.meta_info_enable);
+		mutex_unlock(&audio->lock);
+		break;
+	}
+	case AUDIO_GET_BUF_CFG_32: {
+		struct msm_audio_buf_cfg32 cfg_32;
+		pr_debug("%s[%p]:session id %d: Get-buf-cfg: meta[%d] framesperbuf[%d]\n",
+			 __func__, audio,
+			audio->ac->session, audio->buf_cfg.meta_info_enable,
+			audio->buf_cfg.frames_per_buf);
+
+		mutex_lock(&audio->lock);
+		cfg_32.meta_info_enable = audio->buf_cfg.meta_info_enable;
+		cfg_32.frames_per_buf = audio->buf_cfg.frames_per_buf;
+		if (copy_to_user((void *)arg, &cfg_32,
+			sizeof(struct msm_audio_buf_cfg32))) {
+			pr_err("%s: copy_to_user for AUDIO_GET_BUF_CFG_32 failed\n",
+				__func__);
+			rc = -EFAULT;
+		}
+		mutex_unlock(&audio->lock);
+		break;
+	}
+	case AUDIO_REGISTER_ION_32: {
+		struct msm_audio_ion_info32 info_32;
+		struct msm_audio_ion_info info;
+		pr_debug("%s[%p]:AUDIO_REGISTER_ION\n", __func__, audio);
+		mutex_lock(&audio->lock);
+		if (copy_from_user(&info_32, (void *)arg, sizeof(info_32))) {
+			pr_err("%s: copy_from_user for AUDIO_REGISTER_ION_32 failed\n",
+				__func__);
+			rc = -EFAULT;
+		} else {
+			info.fd = info_32.fd;
+			info.vaddr = compat_ptr(info_32.vaddr);
+			rc = audio_aio_ion_add(audio, &info);
+		}
+		mutex_unlock(&audio->lock);
+		break;
+	}
+	case AUDIO_DEREGISTER_ION_32: {
+		struct msm_audio_ion_info32 info_32;
+		struct msm_audio_ion_info info;
 		mutex_lock(&audio->lock);
 		if (copy_to_user((void *)arg, &audio->ac->session,
 			sizeof(unsigned short))) {
