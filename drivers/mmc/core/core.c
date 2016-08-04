@@ -85,8 +85,8 @@ static const unsigned freqs[] = { 400000, 300000, 200000, 100000 };
  * performance cost, and for other reasons may not always be desired.
  * So we allow it it to be disabled.
  */
-bool use_spi_crc = 1;
-module_param(use_spi_crc, bool, 0644);
+bool use_spi_crc = 0;
+module_param(use_spi_crc, bool, 0);
 
 /*
  * We normally treat cards as removed during suspend if they are not
@@ -3396,7 +3396,7 @@ static int mmc_rescan_try_freq(struct mmc_host *host, unsigned freq)
 int _mmc_detect_card_removed(struct mmc_host *host)
 {
 	int ret;
-	
+
 #ifdef CONFIG_HUAWEI_SDCARD_DSM
 	int i;
 
@@ -3406,7 +3406,7 @@ int _mmc_detect_card_removed(struct mmc_host *host)
 		{
 			dsm_sdcard_cmd_logs[i].value = 0;
 		}
-		
+
 	}
 #endif
 
@@ -4133,7 +4133,7 @@ static int __init mmc_init(void)
             dentry_mmclog, NULL, &debug_mask_fops);
     }
 #endif
-  
+
 	return 0;
 
 unregister_host_class:
