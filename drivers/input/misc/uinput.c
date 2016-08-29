@@ -446,6 +446,7 @@ static inline ssize_t uinput_inject_event(struct uinput_device *udev, const char
 	if (ev.type == 2 && ev.code == 2) {
 		*do_sleep = 1;
 	}
+
 	return input_event_size();
 }
 
@@ -468,6 +469,12 @@ static ssize_t uinput_write(struct file *file, const char __user *buffer,
 			uinput_setup_device(udev, buffer, count);
 
 	mutex_unlock(&udev->mutex);
+
+		/* XXX UGLY HACK to throttle system_server orientation sensor code */
+	if (do_sleep) {
+		set_current_state(TASK_INTERRUPTIBLE);
+		schedule_timeout(HZ/5);
+	}
 
 	/* XXX UGLY HACK to throttle system_server orientation sensor code */
 	if (do_sleep) {
