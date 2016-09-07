@@ -121,6 +121,11 @@ config IOSCHED_SIOPLUS
 	default y
 	---help---
 
+config IOSCHED_FIFO
+	tristate "FIFO I/O scheduler"
+	default y
+	---help---
+
 choice
 	prompt "Default I/O scheduler"
 	default DEFAULT_CFQ
@@ -171,6 +176,9 @@ choice
 
 	config DEFAULT_VR
 		bool "VR" if IOSCHED_ZEN=y
+
+	config DEFAULT_FIFO
+		bool "fifo" if IOSCHED_FIFO=y
 
 endchoice
 
