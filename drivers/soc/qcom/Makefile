@@ -60,4 +60,7 @@ obj-$(CONFIG_MSM_CPU_PWR_CTL) += cpu_pwr_ctl.o
 obj-$(CONFIG_STATE_NOTIFIER) += state_notifier.o
 obj-$(CONFIG_MSM_LIMITER) += msm_limiter.o
 obj-$(CONFIG_MSM_HOTPLUG) += msm_hotplug.o
+obj-$(CONFIG_ALUCARD_HOTPLUG) 	+= alucard_hotplug.o
+obj-$(CONFIG_INTELLI_PLUG) 	+= intelli_plug.o
+obj-$(CONFIG_ASMP)		+= autosmp.o 
 obj-$(CONFIG_FORCE_FAST_CHARGE) += fastchg.o
