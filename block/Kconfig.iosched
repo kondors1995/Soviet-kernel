@@ -61,6 +61,10 @@ config IOSCHED_CFQ
 
 	  This is the default I/O scheduler.
 
+config IOSCHED_SIO
+ 	tristate "Simple I/O scheduler"
+ 	default y
+
 config CFQ_GROUP_IOSCHED
 	bool "CFQ Group Scheduling support"
 	depends on IOSCHED_CFQ && BLK_CGROUP
@@ -151,7 +155,10 @@ choice
 		bool "TRIPNDROID" if IOSCHED_TRIPNDROID=y
 
 	config DEFAULT_NOOP
-		bool "No-op"
+		bool "No-op" if IOSCHED_NOOP=y
+
+	config DEFAULT_SIO
+		bool "SIO" if IOSCHED_SIO=y
 
 	config DEFAULT_VR
 		bool "VR" if IOSCHED_ZEN=y
@@ -166,10 +173,11 @@ config DEFAULT_IOSCHED
 	default "fiops" if DEFAULT_FIOPS
 	default "bfq" if DEFAULT_BFQ
 	default "noop" if DEFAULT_NOOP
+	default "sio" if DEFAULT_SIO
 	default "fifo" if DEFAULT_FIFO
 	default "zen" if DEFAULT_ZEN
 	default "tripndroid" if DEFAULT_TRIPNDROID
- 	default "vr" if DEFAULT_VR 
+ 	default "vr" if DEFAULT_VR
 
 endmenu
 
