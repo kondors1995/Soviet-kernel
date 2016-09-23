@@ -36,11 +36,11 @@
 
 /* Tuning Interface */
 #define MIN_SAMPLING_RATE		10000
-#define SAMPLING_RATE			100000
-#define INC_CPU_LOAD_AT_MIN_FREQ	90
-#define INC_CPU_LOAD			90
-#define DEC_CPU_LOAD_AT_MIN_FREQ	90
-#define DEC_CPU_LOAD 			90
+#define SAMPLING_RATE			50000
+#define INC_CPU_LOAD_AT_MIN_FREQ	70
+#define INC_CPU_LOAD			70
+#define DEC_CPU_LOAD_AT_MIN_FREQ	70
+#define DEC_CPU_LOAD 			70
 
 #define CPUS_UP_RATE			1
 #define CPUS_DOWN_RATE			2

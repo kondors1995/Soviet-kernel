@@ -283,11 +283,11 @@ config CPU_FREQ_GOV_YANKACTIVE
 
 config CPU_FREQ_GOV_ALUCARD
 	tristate "'alucard' cpufreq governor"
-    depends on CPU_FREQ
+        depends on CPU_FREQ
 
 config CPU_FREQ_GOV_HYPER
 	tristate "'HYPER' cpufreq governor"
-    depends on CPU_FREQ
+        depends on CPU_FREQ
 
 config CPU_FREQ_GOV_BIOSHOCK
 	tristate "'bioshock' cpufreq bioshock"

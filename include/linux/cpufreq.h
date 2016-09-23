@@ -462,10 +462,10 @@ extern struct cpufreq_governor cpufreq_gov_yankactive;
 #define CPUFREQ_DEFAULT_GOVERNOR	(&cpufreq_gov_yankactive)
 #elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_HYPER)
 extern struct cpufreq_governor cpufreq_gov_HYPER;
-#define CPUFREQ_DEFAULT_GOVERNOR	(&cpufreq_gov_HYPER)
+#define CPUFREQ_DEFAULT_GOVERNOR (&cpufreq_gov_HYPER)
 #elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_ALUCARD)
 extern struct cpufreq_governor cpufreq_gov_alucard;
-#define CPUFREQ_DEFAULT_GOVERNOR	(&cpufreq_gov_alucard)
+#define CPUFREQ_DEFAULT_GOVERNOR (&cpufreq_gov_alucard)
 #elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_INTELLIDEMAND)
 extern struct cpufreq_governor cpufreq_gov_intellidemand;
 #define CPUFREQ_DEFAULT_GOVERNOR (&cpufreq_gov_intellidemand)
