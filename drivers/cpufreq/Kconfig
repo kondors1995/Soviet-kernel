@@ -165,6 +165,9 @@ config CPU_FREQ_DEFAULT_GOV_BIOSHOCK
 	help
 	  Default governor of BioShock kernel
 
+config CPU_FREQ_DEFAULT_GOV_INTELLIDEMAND
+ 	bool "intellidemand"
+ 	select CPU_FREQ_GOV_INTELLIDEMAND
 
 endchoice
 
@@ -269,6 +272,10 @@ config CPU_FREQ_GOV_ZZMOOVE
 config CPU_FREQ_GOV_DARKNESS
 	tristate "'darkness' cpufreq policy governor"	  
 	depends on CPU_FREQ
+
+config CPU_FREQ_GOV_INTELLIDEMAND
+ 	tristate "'intellidemand' cpufreq governor"
+ 	depends on CPU_FREQ
 
 config CPU_FREQ_GOV_YANKACTIVE
 	tristate "'yankactive' cpufreq policy governor"
