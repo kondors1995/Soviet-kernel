@@ -177,6 +177,9 @@ struct od_dbs_tuners {
 	unsigned int up_threshold;
 	unsigned int powersave_bias;
 	unsigned int io_is_busy;
+	unsigned int touch_load;
+	unsigned int touch_load_duration;
+	unsigned int touch_load_threshold;
 };
 
 struct cs_dbs_tuners {
@@ -186,6 +189,7 @@ struct cs_dbs_tuners {
 	unsigned int up_threshold;
 	unsigned int down_threshold;
 	unsigned int freq_step;
+	unsigned int touch_load_duration;
 };
 
 /* Common Governor data across policies */
