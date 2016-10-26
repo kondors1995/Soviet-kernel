@@ -1325,7 +1325,7 @@ static int do_umount(struct mount *mnt, int flags)
 	return retval;
 }
 
-/* 
+/*
  * Is the caller allowed to modify his namespace?
  */
 static inline bool may_mount(void)
@@ -1759,7 +1759,7 @@ static int do_loopback(struct path *path, const char *old_name,
 
 	err = -EINVAL;
 	if (mnt_ns_loop(&old_path))
-		goto out; 
+		goto out;
 
 	mp = lock_mount(path);
 	err = PTR_ERR(mp);
@@ -1877,7 +1877,7 @@ static int do_remount(struct path *path, int flags, int mnt_flags,
 	else if (!capable(CAP_SYS_ADMIN))
 		err = -EPERM;
 	else {
-		err = do_remount_sb2(path->mnt, sb, flags, data, 0);
+		err = do_remount_sb(sb, flags, data, 0);
 		namespace_lock();
 		br_write_lock(&vfsmount_lock);
 		propagate_remount(mnt);
