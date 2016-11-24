@@ -1,4 +1,5 @@
-default: all
+MODNAME := wlan
+WLAN_ROOT := drivers/staging/prima
 
 KBUILD_OPTIONS := WLAN_ROOT=$(PWD)
 KBUILD_OPTIONS += MODNAME=wlan
@@ -13,5 +14,3 @@ modules_install:
 clean::
 	rm -f *.o *.ko *.mod.c *.mod.o *~ .*.cmd Module.symvers
 	rm -rf .tmp_versions
-
-
