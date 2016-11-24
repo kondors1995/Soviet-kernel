@@ -389,9 +389,14 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-strict-aliasing -fno-common \
 		   -Werror-implicit-function-declaration \
 		   -Wno-format-security \
-		   -fno-delete-null-pointer-checks \
-		   -std=gnu89
-
+		   -Wno-unused-const-variable \
+ 		   -Wno-misleading-indentation \
+ 		   -Wno-shift-overflow \
+ 		   -Wno-bool-compare \
+		   -fno-delete-null-pointer-checks -fgnu89-inline\
+		   -fmodulo-sched -fmodulo-sched-allow-regmoves -fno-tree-vectorize -ffast-math \
+       -funswitch-loops -fpredictive-commoning -fgcse-after-reload \
+		   -fno-aggressive-loop-optimizations
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
 KBUILD_AFLAGS   := -D__ASSEMBLY__
