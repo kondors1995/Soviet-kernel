@@ -3,7 +3,7 @@ echo Do you want to clean?
 read REPLY1
 if [[ $REPLY1 =~ ^[Yy]$ ]]
 then
-    
+
     make clean && make mrproper
     git reset --hard
     echo Do you want to compile kernel?
@@ -12,7 +12,7 @@ then
         if [[ $REPLY2 =~ ^[Yy]$ ]]
         then
             export ARCH=arm
-            export CROSS_COMPILE=~/Android/Kernel/toolchains/SMxU-6.0/bin/arm-eabi-
+            export CROSS_COMPILE=~/Android/Kernel/toolchains/arm-eabi-6.x-uber/bin/arm-eabi-
             make g620s_defconfig
             echo "Enter number of threads: "
             read input_variable
@@ -20,7 +20,7 @@ then
             make -j$input_variable
             cp arch/arm/boot/zImage '/home/quagmire/Desktop/2/uber'
             find . -name '*ko' -exec cp '{}' '/home/quagmire/Desktop/2/uber' \;
-                
+
         fi
 
 elif [[ $REPLY1 =~ ^[Nn]$ ]]
@@ -31,9 +31,9 @@ then
 
         if [[ $REPLY3 =~ ^[Yy]$ ]]
         then
-                
+
             export ARCH=arm
-            export CROSS_COMPILE=~/Android/Kernel/toolchains/SMxU-6.0/bin/arm-eabi-
+            export CROSS_COMPILE=~/Android/Kernel/toolchains/arm-eabi-6.x-uber/bin/arm-eabi-
             make g620s_defconfig
             echo "Enter number of threads: "
             read input_variable
