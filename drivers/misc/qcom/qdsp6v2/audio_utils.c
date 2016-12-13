@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2016, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2010-2014, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -362,95 +362,11 @@ long audio_in_ioctl(struct file *file,
 				break;
 			}
 		}
-		audio->buf_alloc |= BUF_ALLOC_OUT;
-		pr_debug("%s:session id %d: AUDIO_SET_STREAM_CONFIG %d %d\n",
-				__func__, audio->ac->session,
-				audio->str_cfg.buffer_size,
-				audio->str_cfg.buffer_count);
-		break;
-	}
-	case AUDIO_SET_BUF_CFG_32: {
-		struct msm_audio_buf_cfg32 cfg_32;
-		struct msm_audio_buf_cfg cfg;
-		if (copy_from_user(&cfg_32, (void *)arg, sizeof(cfg_32))) {
-			pr_err("%s: copy_from_user for AUDIO_SET_BUG_CFG_32 failed",
-				__func__);
-			rc = -EFAULT;
-			break;
-		}
-		cfg.meta_info_enable = cfg_32.meta_info_enable;
-		cfg.frames_per_buf = cfg_32.frames_per_buf;
-
-		if ((audio->feedback == NON_TUNNEL_MODE) &&
-			!cfg.meta_info_enable) {
-			rc = -EFAULT;
-			break;
-		}
-
-		/* Restrict the num of frames per buf to coincide with
-		 * default buf size */
-		if (cfg.frames_per_buf > audio->max_frames_per_buf) {
-			rc = -EFAULT;
-			break;
-		}
-		audio->buf_cfg.meta_info_enable = cfg.meta_info_enable;
-		audio->buf_cfg.frames_per_buf = cfg.frames_per_buf;
-		pr_debug("%s:session id %d: Set-buf-cfg: meta[%d] framesperbuf[%d]\n",
-			__func__, audio->ac->session, cfg.meta_info_enable,
-			cfg.frames_per_buf);
-		break;
-	}
-	case AUDIO_GET_BUF_CFG_32: {
-		struct msm_audio_buf_cfg32 cfg_32;
-		pr_debug("%s:session id %d: Get-buf-cfg: meta[%d] framesperbuf[%d]\n",
-			__func__,
-			audio->ac->session, audio->buf_cfg.meta_info_enable,
-			audio->buf_cfg.frames_per_buf);
-		cfg_32.meta_info_enable = audio->buf_cfg.meta_info_enable;
-		cfg_32.frames_per_buf = audio->buf_cfg.frames_per_buf;
-
-		if (copy_to_user((void *)arg, &cfg_32,
-			sizeof(struct msm_audio_buf_cfg32))) {
-			pr_err("%s: Copy to user failed\n", __func__);
-			rc = -EFAULT;
-		}
-		break;
-	}
-	case AUDIO_GET_CONFIG_32: {
-		struct msm_audio_config32 cfg_32;
-		memset(&cfg_32, 0, sizeof(cfg_32));
-		cfg_32.buffer_size = audio->pcm_cfg.buffer_size;
-		cfg_32.buffer_count = audio->pcm_cfg.buffer_count;
-		cfg_32.channel_count = audio->pcm_cfg.channel_count;
-		cfg_32.sample_rate = audio->pcm_cfg.sample_rate;
-		cfg_32.type = audio->pcm_cfg.type;
-		cfg_32.meta_field = audio->pcm_cfg.meta_field;
-		cfg_32.bits = audio->pcm_cfg.bits;
-
-		if (copy_to_user((void *)arg, &cfg_32,
-					sizeof(struct msm_audio_config32))) {
-			pr_err("%s: Copy to user failed\n", __func__);
-			rc = -EFAULT;
-		}
-		break;
-	}
-	case AUDIO_SET_CONFIG_32: {
-		struct msm_audio_config32 cfg_32;
-		struct msm_audio_config cfg;
-		if (copy_from_user(&cfg_32, (void *)arg, sizeof(cfg_32))) {
-			pr_err("%s: copy_from_user for AUDIO_SET_CONFIG_32 failed\n",
-				__func__);
-			rc = -EFAULT;
-			break;
-		}
-		cfg.buffer_size = cfg_32.buffer_size;
-		cfg.buffer_count = cfg_32.buffer_count;
-		cfg.channel_count = cfg_32.channel_count;
-		cfg.sample_rate = cfg_32.sample_rate;
-		cfg.type = cfg_32.type;
-		cfg.meta_field = cfg_32.meta_field;
-		cfg.bits = cfg_32.bits;
-		rc = audio_in_set_config(file, &cfg);
+		audio->buf_alloc |= BUF_ALLOC_IN;
+		rc = 0;
+		pr_debug("%s:session id %d: AUDIO_SET_CONFIG %d %d\n", __func__,
+			audio->ac->session, audio->pcm_cfg.buffer_count,
+			audio->pcm_cfg.buffer_size);
 		break;
 	}
 	default:
@@ -737,3 +653,4 @@ int audio_in_release(struct inode *inode, struct file *file)
 	kfree(audio);
 	return 0;
 }
+
