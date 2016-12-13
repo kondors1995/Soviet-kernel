@@ -50,7 +50,7 @@ int graphics_boost = 4;
 #endif
 
 /* Number of jiffies for a full thermal cycle */
-#define TH_HZ			(HZ/5)
+#define TH_HZ			20
 
 #define KGSL_MAX_BUSLEVELS	20
 
@@ -1343,7 +1343,7 @@ int kgsl_pwrctrl_init(struct kgsl_device *device)
 
 	pwr->power_flags = 0;
 
-	pwr->interval_timeout = msecs_to_jiffies(pdata->idle_timeout);
+	pwr->interval_timeout = pdata->idle_timeout;
 	pwr->strtstp_sleepwake = pdata->strtstp_sleepwake;
 
 	if (kgsl_property_read_u32(device, "qcom,pm-qos-active-latency",
@@ -2087,7 +2087,7 @@ static int _check_active_count(struct kgsl_device *device, int count)
 int kgsl_active_count_wait(struct kgsl_device *device, int count)
 {
 	int result = 0;
-	long wait_jiffies = msecs_to_jiffies(1000);
+	long wait_jiffies = HZ;
 
 	BUG_ON(!mutex_is_locked(&device->mutex));
 
