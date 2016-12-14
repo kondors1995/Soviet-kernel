@@ -15,10 +15,16 @@
 #include <linux/pagemap.h>
 #include <linux/quotaops.h>
 #include <linux/backing-dev.h>
+#include <linux/fsync.h>
 #include "internal.h"
-#ifdef CONFIG_ASYNC_FSYNC
-#include <linux/statfs.h>
-#endif
+
+bool fsync_enabled = false;
+module_param(fsync_enabled, bool, 0644);
+
+void set_fsync(bool enable)
+{
+        fsync_enabled = enable;
+}
 
 #define VALID_FLAGS (SYNC_FILE_RANGE_WAIT_BEFORE|SYNC_FILE_RANGE_WRITE| \
 			SYNC_FILE_RANGE_WAIT_AFTER)
@@ -242,6 +248,9 @@ SYSCALL_DEFINE1(syncfs, int, fd)
  */
 int vfs_fsync_range(struct file *file, loff_t start, loff_t end, int datasync)
 {
+	if (!fsync_enabled)
+		return 0;
+
 	if (!file->f_op || !file->f_op->fsync)
 		return -EINVAL;
 	return file->f_op->fsync(file, start, end, datasync);
@@ -258,6 +267,9 @@ EXPORT_SYMBOL(vfs_fsync_range);
  */
 int vfs_fsync(struct file *file, int datasync)
 {
+	if (!fsync_enabled)
+		return 0;
+
 	return vfs_fsync_range(file, 0, LLONG_MAX, datasync);
 }
 EXPORT_SYMBOL(vfs_fsync);
@@ -321,9 +333,10 @@ static int do_fsync(unsigned int fd, int datasync)
 {
 	struct fd f = fdget(fd);
 	int ret = -EBADF;
-#ifdef CONFIG_ASYNC_FSYNC
-        struct fsync_work *fwork;
-#endif
+
+	if (!fsync_enabled)
+		return 0;
+
 	if (f.file) {
 #ifdef CONFIG_ASYNC_FSYNC
                 ktime_t fsync_t, fsync_diff;
