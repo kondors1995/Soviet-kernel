@@ -85,3 +85,5 @@ obj-$(CONFIG_ARCH_MSM8974) += msm_mpmctr.o
 
 obj-$(CONFIG_ARCH_RANDOM) += early_random.o
 obj-$(CONFIG_PERFMAP) += perfmap.o
+
+obj-$(CONFIG_FORCE_FAST_CHARGE) += fastchg.o
