@@ -389,8 +389,8 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -Wno-unused-const-variable \
  		   -Wno-misleading-indentation \
  		   -Wno-shift-overflow \
- 		   -Wno-bool-compare \
-			 
+ 		   -Wno-bool-compare 
+
 
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
