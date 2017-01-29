@@ -153,7 +153,6 @@ void dbs_check_cpu(struct dbs_data *dbs_data, int cpu)
 		if (load > max_load)
 			max_load = load;
 	}
-	cdbs->deferred_periods = deferred_periods;
 
 	dbs_data->cdata->gov_check_cpu(cpu, max_load);
 }
