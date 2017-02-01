@@ -43,6 +43,10 @@
 
 #include <soc/qcom/smd.h>
 
+#ifdef CONFIG_MACH_HUAWEI
+#include <linux/config_interface.h>
+#endif
+
 #define DEVICE "wcnss_wlan"
 #define CTRL_DEVICE "wcnss_ctrl"
 #define VERSION "1.01"
@@ -1121,6 +1125,25 @@ void wcnss_reset_intr(void)
 	}
 }
 EXPORT_SYMBOL(wcnss_reset_intr);
+
+void wcnss_reset_fiq(bool clk_chk_en)
+{
+	if (wcnss_hardware_type() == WCNSS_PRONTO_HW) {
+		if (clk_chk_en) {
+			wcnss_log_debug_regs_on_bite();
+		} else {
+			wcnss_pronto_log_debug_regs();
+			if (wcnss_get_mux_control())
+				wcnss_log_iris_regs();
+		}
+		/* Insert memory barrier before writing fiq register */
+		wmb();
+		__raw_writel(1 << 16, penv->fiq_reg);
+	} else {
+		wcnss_riva_log_debug_regs();
+	}
+}
+EXPORT_SYMBOL(wcnss_reset_fiq);
 
 static int wcnss_create_sysfs(struct device *dev)
 {
@@ -2299,6 +2322,24 @@ static void wcnss_pm_qos_enable_pc(struct work_struct *worker)
 
 static DECLARE_RWSEM(wcnss_pm_sem);
 
+#ifdef CONFIG_MACH_HUAWEI
+#define NAME_LEN 32
+#define NVBIN_FILE_4X "wlan/prima/WCNSS_qcom_wlan_nv_4x.bin"
+
+void wcnss_get_nv_file(char *nv_file, int size)
+{
+	char huawei_product_name[NAME_LEN];
+	int ret = 0;
+
+	ret = get_product_name(huawei_product_name, NAME_LEN);
+	if (strstr(huawei_product_name, "Che1") != NULL)
+		strlcpy(nv_file, NVBIN_FILE_4X, size);
+	else
+		strlcpy(nv_file, NVBIN_FILE, size);
+}
+EXPORT_SYMBOL(wcnss_get_nv_file);
+#endif
+
 static void wcnss_nvbin_dnld(void)
 {
 	int ret = 0;
@@ -2312,9 +2353,24 @@ static void wcnss_nvbin_dnld(void)
 	unsigned int nv_blob_size = 0;
 	const struct firmware *nv = NULL;
 	struct device *dev = &penv->pdev->dev;
+#ifdef CONFIG_MACH_HUAWEI
+	char huawei_wlan_nv_file[40];
+#endif
 
 	down_read(&wcnss_pm_sem);
 
+#ifdef CONFIG_MACH_HUAWEI
+	wcnss_get_nv_file(huawei_wlan_nv_file, sizeof(huawei_wlan_nv_file));
+	pr_info("wcnss: Get nv file from %s\n", huawei_wlan_nv_file);
+
+	ret = request_firmware(&nv, huawei_wlan_nv_file, dev);
+
+	if (ret || !nv || !nv->data || !nv->size) {
+		pr_err("wcnss: %s: request_firmware failed for %s\n",
+			__func__, huawei_wlan_nv_file);
+		goto out;
+	}
+#else
 	ret = request_firmware(&nv, NVBIN_FILE, dev);
 
 	if (ret || !nv || !nv->data || !nv->size) {
@@ -2322,6 +2378,7 @@ static void wcnss_nvbin_dnld(void)
 			__func__, NVBIN_FILE, ret);
 		goto out;
 	}
+#endif
 
 	/* First 4 bytes in nv blob is validity bitmap.
 	 * We cannot validate nv, so skip those 4 bytes.
@@ -3042,6 +3099,40 @@ fail_gpio_res:
 	penv = NULL;
 	return ret;
 }
+
+/* wlan prop driver cannot invoke cancel_work_sync
+ * function directly, so to invoke this function it
+ * call wcnss_flush_work function
+ */
+void wcnss_flush_work(struct work_struct *work)
+{
+	struct work_struct *cnss_work = work;
+	if (cnss_work != NULL)
+		cancel_work_sync(cnss_work);
+}
+EXPORT_SYMBOL(wcnss_flush_work);
+
+/* wlan prop driver cannot invoke show_stack
+ * function directly, so to invoke this function it
+ * call wcnss_dump_stack function
+ */
+void wcnss_dump_stack(struct task_struct *task)
+{
+	show_stack(task, NULL);
+}
+EXPORT_SYMBOL(wcnss_dump_stack);
+
+/* wlan prop driver cannot invoke cancel_delayed_work_sync
+ * function directly, so to invoke this function it call
+ * wcnss_flush_delayed_work function
+ */
+void wcnss_flush_delayed_work(struct delayed_work *dwork)
+{
+	struct delayed_work *cnss_dwork = dwork;
+	if (cnss_dwork != NULL)
+		cancel_delayed_work_sync(cnss_dwork);
+}
+EXPORT_SYMBOL(wcnss_flush_delayed_work);
 
 static int wcnss_node_open(struct inode *inode, struct file *file)
 {

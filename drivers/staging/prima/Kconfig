@@ -38,7 +38,7 @@ config PRIMA_WLAN_11AC_HIGH_TP
 	default n
 
 config QCOM_TDLS
-	bool "Enable TDLS feature"
+	bool "Enable TDLS (Tunnel Direct Link Setup) feature"
 	default n
 
 config WLAN_FEATURE_11W
