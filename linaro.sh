@@ -13,7 +13,7 @@ then
         then
             export ARCH=arm
             export CROSS_COMPILE=~/Android/Kernel/toolchains/arm-eabi-6.2.1-linaro/bin/arm-eabi-
-            make cm_hwY550_defconfig
+            make g620s_defconfig
             echo "Enter number of threads: "
             read input_variable
             echo "You entered: $input_variable"
@@ -39,7 +39,7 @@ then
 
             export ARCH=arm
             export CROSS_COMPILE=~/Android/Kernel/toolchains/arm-eabi-6.2.1-linaro/bin/arm-eabi-
-            make cm_hwY550_defconfig
+            make g620s_defconfig
             echo "Enter number of threads: "
             read input_variable
             echo "You entered: $input_variable"
