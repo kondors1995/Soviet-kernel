@@ -7566,7 +7566,7 @@ const struct wiphy_vendor_command hdd_wiphy_vendor_commands[] =
         .flags = WIPHY_VENDOR_CMD_NEED_WDEV |
                  WIPHY_VENDOR_CMD_NEED_NETDEV |
                  WIPHY_VENDOR_CMD_NEED_RUNNING,
-        .doit = (void *)wlan_hdd_cfg80211_extscan_reset_significant_change
+        .doit = (void *)wlan_hdd_cfg80211_extscan_reset_ssid_hotlist
     },
 #endif /* WLAN_FEATURE_EXTSCAN */
 /*EXT TDLS*/
