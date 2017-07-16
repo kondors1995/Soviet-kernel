@@ -43,6 +43,8 @@ extern struct msmfb_cabc_config g_cabc_cfg_foresd;
 
 DEFINE_LED_TRIGGER(bl_led_trigger);
 
+extern void lazyplug_enter_lazy(bool enter);
+
 bool display_on = true;
 
 bool is_display_on(void)
@@ -634,6 +636,7 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 	}
 
 	display_on = true;
+  lazyplug_enter_lazy(false);
 
 	pinfo = &pdata->panel_info;
 
@@ -703,6 +706,7 @@ static int mdss_dsi_panel_off(struct mdss_panel_data *pdata)
 		mdss_dsi_panel_cmds_send(ctrl, &ctrl->off_cmds);
 
 		display_on = false;
+    lazyplug_enter_lazy(true);
 
 #ifdef CONFIG_HUAWEI_LCD
 	pr_info("exit %s\n",__func__);
