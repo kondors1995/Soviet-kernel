@@ -21,7 +21,6 @@
 #include <linux/leds.h>
 #include <linux/qpnp/pwm.h>
 #include <linux/err.h>
-#include <linux/display_state.h>
 
 #include "mdss_dsi.h"
 #include <linux/log_jank.h>
@@ -42,13 +41,6 @@ extern struct msmfb_cabc_config g_cabc_cfg_foresd;
 #define NT35596_MAX_ERR_CNT 2
 
 DEFINE_LED_TRIGGER(bl_led_trigger);
-
-bool display_on = true;
-
-bool is_display_on()
-{
-	return display_on;
-}
 
 void mdss_dsi_panel_pwm_cfg(struct mdss_dsi_ctrl_pdata *ctrl)
 {
@@ -633,8 +625,6 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 		return -EINVAL;
 	}
 
-	display_on = true;
-
 	pinfo = &pdata->panel_info;
 
 	ctrl = container_of(pdata, struct mdss_dsi_ctrl_pdata,
@@ -701,7 +691,6 @@ static int mdss_dsi_panel_off(struct mdss_panel_data *pdata)
 
 	if (ctrl->off_cmds.cmd_cnt)
 		mdss_dsi_panel_cmds_send(ctrl, &ctrl->off_cmds);
-		display_on = false;
 
 #ifdef CONFIG_HUAWEI_LCD
 	pr_info("exit %s\n",__func__);
@@ -724,7 +713,7 @@ static int mdss_dsi_panel_inversion_ctrl(struct mdss_panel_data *pdata,u32 imode
 	}
 	ctrl_pdata = container_of(pdata, struct mdss_dsi_ctrl_pdata,
 				panel_data);
-
+	
 	switch(imode)
 	{
 		case COLUMN_INVERSION: //column inversion mode
@@ -751,8 +740,8 @@ static int mdss_dsi_check_panel_status(struct mdss_panel_data *pdata)
 	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
 	int ret = 0;
 	int count = 5;
-	/* because the max read length is 3, so change returned value buffer size to char*3 */
-	char rdata[3] = {0};
+	/* because the max read length is 3, so change returned value buffer size to char*3 */  
+	char rdata[3] = {0}; 
 	char expect_value = 0x9C;
 	int read_length = 1;
 
@@ -783,7 +772,7 @@ static int mdss_dsi_check_panel_status(struct mdss_panel_data *pdata)
 
 		if(0 == count)
 			ret = -EINVAL;
-
+	
 		return ret;
 	}
 }
@@ -1698,7 +1687,7 @@ static int mdss_panel_parse_dt(struct device_node *np,
 
 #ifdef CONFIG_FB_AUTO_CABC
 	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->dsi_panel_cabc_ui_cmds,
-		"qcom,panel-cabc-ui-cmds", "qcom,cabc-ui-cmds-dsi-state");
+		"qcom,panel-cabc-ui-cmds", "qcom,cabc-ui-cmds-dsi-state"); 
 	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->dsi_panel_cabc_video_cmds,
 		"qcom,panel-cabc-video-cmds", "qcom,cabc-video-cmds-dsi-state");
 #endif
