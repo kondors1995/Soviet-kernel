@@ -49,8 +49,8 @@
  * The new code replaces the old recursive symlink resolution with
  * an iterative one (in case of non-nested symlink chains).  It does
  * this with calls to <fs>_follow_link().
- * As a side effect, dir_namei(), _namei() and follow_link() are now 
- * replaced with a single function lookup_dentry() that can handle all 
+ * As a side effect, dir_namei(), _namei() and follow_link() are now
+ * replaced with a single function lookup_dentry() that can handle all
  * the special cases of the former code.
  *
  * With the new dcache, the pathname is stored at each inode, at least as
@@ -1795,7 +1795,7 @@ static int link_path_walk(const char *name, struct nameidata *nd)
 {
 	struct path next;
 	int err;
-	
+
 	while (*name=='/')
 		name++;
 	if (!*name)
@@ -1864,7 +1864,7 @@ static int link_path_walk(const char *name, struct nameidata *nd)
 				return err;
 		}
 		if (!can_lookup(nd->inode)) {
-			err = -ENOTDIR; 
+			err = -ENOTDIR;
 			break;
 		}
 	}
@@ -2023,16 +2023,6 @@ static int path_lookupat(int dfd, const char *name,
 		if (!can_lookup(nd->inode)) {
 			path_put(&nd->path);
 			err = -ENOTDIR;
-		}
-	}
-
-	if (!err) {
-		struct super_block *sb = nd->inode->i_sb;
-		if (sb->s_flags & MS_RDONLY) {
-			if (d_is_su(nd->path.dentry) && !su_visible()) {
-				path_put(&nd->path);
-				err = -ENOENT;
-			}
 		}
 	}
 
@@ -3926,7 +3916,7 @@ int vfs_rename2(struct vfsmount *mnt,
 
 	if (old_dentry->d_inode == new_dentry->d_inode)
  		return 0;
- 
+
 	error = may_delete(mnt, old_dir, old_dentry, is_dir);
 	if (error)
 		return error;
